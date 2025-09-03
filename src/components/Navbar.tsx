@@ -5,7 +5,7 @@ import { useAuthStore } from '@/lib/stores/auth-store';
 import { useState } from 'react';
 
 export const Navbar = () => {
-  const { user, isAuthenticated, logout } = useAuthStore();
+  const { user, logout } = useAuthStore();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -42,7 +42,7 @@ export const Navbar = () => {
               Locations
             </Link>
             
-            {isAuthenticated ? (
+          {user ? (
               <div className="flex items-center space-x-4">
                 {user?.role === 'customer' && (
                   <Link to="/dashboard">
@@ -111,7 +111,7 @@ export const Navbar = () => {
             >
               Locations
             </Link>
-            {isAuthenticated ? (
+            {user ? (
               <div className="space-y-2">
                 <Link to="/dashboard" onClick={() => setMobileMenuOpen(false)}>
                   <Button variant="ghost" className="w-full justify-start">

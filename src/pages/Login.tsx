@@ -1,50 +1,65 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Camera, Eye, EyeOff } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Camera, Mail, Lock, User, Phone, Loader2 } from 'lucide-react';
 import { useAuthStore } from '@/lib/stores/auth-store';
 import { useToast } from '@/hooks/use-toast';
 
 export default function Login() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  
-  const { login } = useAuthStore();
+  const { user, login, register, isLoading, error } = useAuthStore();
   const { toast } = useToast();
-  const navigate = useNavigate();
+  const [loginData, setLoginData] = useState({ email: '', password: '' });
+  const [registerData, setRegisterData] = useState({ name: '', email: '', password: '', phone: '' });
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  // Redirect if already logged in
+  if (user) {
+    return <Navigate to="/" replace />;
+  }
+
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
-
-    try {
-      const success = await login(email, password);
-      if (success) {
-        toast({
-          title: "Welcome back!",
-          description: "You have been successfully logged in.",
-        });
-        navigate('/');
-      } else {
-        toast({
-          title: "Login failed",
-          description: "Invalid email or password. Please try again.",
-          variant: "destructive",
-        });
-      }
-    } catch (error) {
+    
+    const result = await login(loginData.email, loginData.password);
+    if (result.success) {
       toast({
-        title: "Error",
-        description: "Something went wrong. Please try again.",
-        variant: "destructive",
+        title: "Welcome back!",
+        description: "Successfully logged in.",
       });
-    } finally {
-      setIsLoading(false);
+    } else {
+      toast({
+        variant: "destructive",
+        title: "Login failed",
+        description: result.message,
+      });
+    }
+  };
+
+  const handleRegister = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    const result = await register(
+      registerData.name, 
+      registerData.email, 
+      registerData.password, 
+      registerData.phone
+    );
+    
+    if (result.success) {
+      toast({
+        title: "Account created!",
+        description: "Welcome to Camera Rental Admin.",
+      });
+    } else {
+      toast({
+        variant: "destructive",
+        title: "Registration failed",
+        description: result.message,
+      });
     }
   };
 
@@ -57,98 +72,190 @@ export default function Login() {
             <Camera className="h-8 w-8 text-accent-foreground" />
           </div>
           <h2 className="text-3xl font-bold text-primary-foreground">
-            Sign in to CameraRent
+            Camera Rental Admin
           </h2>
           <p className="mt-2 text-primary-foreground/80">
-            Access your account and manage your rentals
+            Manage your camera rental business
           </p>
         </div>
 
-        {/* Login Form */}
+        {/* Login/Register Tabs */}
         <Card className="bg-card/95 backdrop-blur-sm border-border/50 shadow-elegant">
-          <CardHeader>
-            <CardTitle className="text-center text-foreground">Welcome back</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="space-y-2">
-                <Label htmlFor="email" className="text-foreground">
-                  Email address
-                </Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="you@example.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  className="transition-all duration-300 focus:shadow-card"
-                />
-              </div>
+          <Tabs defaultValue="login" className="w-full">
+            <CardHeader>
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="login">Sign In</TabsTrigger>
+                <TabsTrigger value="register">Register</TabsTrigger>
+              </TabsList>
+            </CardHeader>
 
-              <div className="space-y-2">
-                <Label htmlFor="password" className="text-foreground">
-                  Password
-                </Label>
-                <div className="relative">
-                  <Input
-                    id="password"
-                    type={showPassword ? 'text' : 'password'}
-                    placeholder="Enter your password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    className="pr-10 transition-all duration-300 focus:shadow-card"
-                  />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                    onClick={() => setShowPassword(!showPassword)}
-                  >
-                    {showPassword ? (
-                      <EyeOff className="h-4 w-4 text-muted-foreground" />
+            {/* Login Tab */}
+            <TabsContent value="login">
+              <CardContent className="space-y-4">
+                <CardDescription>
+                  Enter your credentials to access the admin panel
+                </CardDescription>
+                
+                <form onSubmit={handleLogin} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email</Label>
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="email"
+                        type="email"
+                        placeholder="admin@camera-rental.com"
+                        className="pl-10"
+                        value={loginData.email}
+                        onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
+                        required
+                        disabled={isLoading}
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="password">Password</Label>
+                    <div className="relative">
+                      <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="password"
+                        type="password"
+                        placeholder="password123"
+                        className="pl-10"
+                        value={loginData.password}
+                        onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
+                        required
+                        disabled={isLoading}
+                      />
+                    </div>
+                  </div>
+
+                  {error && (
+                    <Alert variant="destructive">
+                      <AlertDescription>{error}</AlertDescription>
+                    </Alert>
+                  )}
+
+                  <Button type="submit" className="w-full" disabled={isLoading}>
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Signing in...
+                      </>
                     ) : (
-                      <Eye className="h-4 w-4 text-muted-foreground" />
+                      'Sign In'
                     )}
                   </Button>
+                </form>
+
+                {/* Demo Info */}
+                <div className="mt-4 p-3 bg-muted/50 rounded-lg">
+                  <p className="text-sm font-medium text-foreground mb-2">Demo Credentials:</p>
+                  <div className="space-y-1 text-xs text-muted-foreground">
+                    <p><strong>Admin:</strong> admin@camera-rental.com</p>
+                    <p><strong>Customer:</strong> john@example.com</p>
+                    <p><em>Password: password123</em></p>
+                  </div>
                 </div>
-              </div>
+              </CardContent>
+            </TabsContent>
 
-              <Button
-                type="submit"
-                variant="hero"
-                className="w-full"
-                disabled={isLoading}
-              >
-                {isLoading ? 'Signing in...' : 'Sign in'}
-              </Button>
-            </form>
+            {/* Register Tab */}
+            <TabsContent value="register">
+              <CardContent className="space-y-4">
+                <CardDescription>
+                  Create a new account to access the system
+                </CardDescription>
+                
+                <form onSubmit={handleRegister} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="register-name">Full Name</Label>
+                    <div className="relative">
+                      <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="register-name"
+                        type="text"
+                        placeholder="John Doe"
+                        className="pl-10"
+                        value={registerData.name}
+                        onChange={(e) => setRegisterData({ ...registerData, name: e.target.value })}
+                        required
+                        disabled={isLoading}
+                      />
+                    </div>
+                  </div>
 
-            {/* Demo Accounts */}
-            <div className="mt-6 p-4 bg-muted/50 rounded-lg">
-              <p className="text-sm font-medium text-foreground mb-2">Demo Accounts:</p>
-              <div className="space-y-1 text-xs text-muted-foreground">
-                <p><strong>Admin:</strong> admin@camerarent.com</p>
-                <p><strong>Customer:</strong> john@example.com</p>
-                <p><em>Password: any password works for demo</em></p>
-              </div>
-            </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="register-email">Email</Label>
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="register-email"
+                        type="email"
+                        placeholder="john@example.com"
+                        className="pl-10"
+                        value={registerData.email}
+                        onChange={(e) => setRegisterData({ ...registerData, email: e.target.value })}
+                        required
+                        disabled={isLoading}
+                      />
+                    </div>
+                  </div>
 
-            {/* Register Link */}
-            <div className="mt-6 text-center">
-              <p className="text-sm text-muted-foreground">
-                Don't have an account?{' '}
-                <Link
-                  to="/register"
-                  className="font-medium text-primary hover:text-primary-glow transition-colors"
-                >
-                  Sign up here
-                </Link>
-              </p>
-            </div>
-          </CardContent>
+                  <div className="space-y-2">
+                    <Label htmlFor="register-phone">Phone (Optional)</Label>
+                    <div className="relative">
+                      <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="register-phone"
+                        type="tel"
+                        placeholder="+1 (555) 000-0000"
+                        className="pl-10"
+                        value={registerData.phone}
+                        onChange={(e) => setRegisterData({ ...registerData, phone: e.target.value })}
+                        disabled={isLoading}
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="register-password">Password</Label>
+                    <div className="relative">
+                      <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="register-password"
+                        type="password"
+                        placeholder="Create a strong password"
+                        className="pl-10"
+                        value={registerData.password}
+                        onChange={(e) => setRegisterData({ ...registerData, password: e.target.value })}
+                        required
+                        disabled={isLoading}
+                      />
+                    </div>
+                  </div>
+
+                  {error && (
+                    <Alert variant="destructive">
+                      <AlertDescription>{error}</AlertDescription>
+                    </Alert>
+                  )}
+
+                  <Button type="submit" className="w-full" disabled={isLoading}>
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Creating account...
+                      </>
+                    ) : (
+                      'Create Account'
+                    )}
+                  </Button>
+                </form>
+              </CardContent>
+            </TabsContent>
+          </Tabs>
         </Card>
       </div>
     </div>

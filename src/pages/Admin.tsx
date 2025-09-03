@@ -1,9 +1,8 @@
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Camera, Users, Calendar, MapPin, Plus, BarChart3 } from 'lucide-react';
+import { Camera, Calendar, Menu } from 'lucide-react';
+import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { useAuthStore } from '@/lib/stores/auth-store';
 import { EquipmentManagement } from '@/components/admin/EquipmentManagement';
 import { BookingManagement } from '@/components/admin/BookingManagement';
@@ -12,6 +11,7 @@ import { StoreManagement } from '@/components/admin/StoreManagement';
 import { AdminStats } from '@/components/admin/AdminStats';
 import { useEquipmentStore } from '@/lib/stores/equipment-store';
 import { useBookingStore } from '@/lib/stores/booking-store';
+import { AppSidebar } from '@/components/AppSidebar';
 
 export default function Admin() {
   const { user } = useAuthStore();
@@ -37,61 +37,11 @@ export default function Admin() {
   const availableEquipment = equipment.filter(item => item.available).length;
   const totalRevenue = bookings.reduce((sum, booking) => sum + booking.totalCost, 0);
 
-  return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <section className="bg-gradient-hero py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl lg:text-4xl font-bold text-primary-foreground mb-2">
-                Admin Dashboard
-              </h1>
-              <p className="text-primary-foreground/90">
-                Manage equipment, bookings, and users
-              </p>
-            </div>
-            <div className="text-right">
-              <p className="text-primary-foreground/80">Welcome back,</p>
-              <p className="text-xl font-semibold text-primary-foreground">{user.name}</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          {/* Tab Navigation */}
-          <TabsList className="grid w-full grid-cols-5 lg:w-auto lg:inline-grid">
-            <TabsTrigger value="overview" className="flex items-center gap-2">
-              <BarChart3 className="h-4 w-4" />
-              <span className="hidden sm:inline">Overview</span>
-            </TabsTrigger>
-            <TabsTrigger value="equipment" className="flex items-center gap-2">
-              <Camera className="h-4 w-4" />
-              <span className="hidden sm:inline">Equipment</span>
-            </TabsTrigger>
-            <TabsTrigger value="bookings" className="flex items-center gap-2">
-              <Calendar className="h-4 w-4" />
-              <span className="hidden sm:inline">Bookings</span>
-              {pendingBookings.length > 0 && (
-                <Badge variant="destructive" className="ml-1 text-xs">
-                  {pendingBookings.length}
-                </Badge>
-              )}
-            </TabsTrigger>
-            <TabsTrigger value="users" className="flex items-center gap-2">
-              <Users className="h-4 w-4" />
-              <span className="hidden sm:inline">Users</span>
-            </TabsTrigger>
-            <TabsTrigger value="stores" className="flex items-center gap-2">
-              <MapPin className="h-4 w-4" />
-              <span className="hidden sm:inline">Stores</span>
-            </TabsTrigger>
-          </TabsList>
-
-          {/* Overview Tab */}
-          <TabsContent value="overview" className="space-y-6">
+  const renderContent = () => {
+    switch (activeTab) {
+      case 'overview':
+        return (
+          <div className="space-y-6">
             <AdminStats />
             
             {/* Quick Stats Cards */}
@@ -203,29 +153,50 @@ export default function Admin() {
                 </CardContent>
               </Card>
             </div>
-          </TabsContent>
+          </div>
+        );
+      case 'equipment':
+        return <EquipmentManagement />;
+      case 'bookings':
+        return <BookingManagement />;
+      case 'users':
+        return <UserManagement />;
+      case 'stores':
+        return <StoreManagement />;
+      default:
+        return null;
+    }
+  };
 
-          {/* Equipment Management */}
-          <TabsContent value="equipment">
-            <EquipmentManagement />
-          </TabsContent>
+  return (
+    <SidebarProvider>
+      <div className="min-h-screen flex w-full bg-background">
+        <AppSidebar activeTab={activeTab} onTabChange={setActiveTab} />
+        
+        <div className="flex-1 flex flex-col">
+          {/* Mobile Header */}
+          <header className="h-16 border-b border-border/40 flex items-center justify-between px-4 lg:hidden">
+            <div className="flex items-center gap-4">
+              <SidebarTrigger>
+                <Menu className="h-5 w-5" />
+              </SidebarTrigger>
+              <h1 className="text-lg font-semibold">Admin Panel</h1>
+            </div>
+            {pendingBookings.length > 0 && (
+              <Badge variant="destructive" className="text-xs">
+                {pendingBookings.length} pending
+              </Badge>
+            )}
+          </header>
 
-          {/* Booking Management */}
-          <TabsContent value="bookings">
-            <BookingManagement />
-          </TabsContent>
-
-          {/* User Management */}
-          <TabsContent value="users">
-            <UserManagement />
-          </TabsContent>
-
-          {/* Store Management */}
-          <TabsContent value="stores">
-            <StoreManagement />
-          </TabsContent>
-        </Tabs>
+          {/* Main Content */}
+          <main className="flex-1 p-6 overflow-auto">
+            <div className="max-w-7xl mx-auto">
+              {renderContent()}
+            </div>
+          </main>
+        </div>
       </div>
-    </div>
+    </SidebarProvider>
   );
 }
