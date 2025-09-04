@@ -22,6 +22,8 @@ interface Store {
   status: 'active' | 'maintenance' | 'closed';
   equipmentCount: number;
   description: string;
+  longitude: number;
+  latitude: number;
 }
 
 // Sample stores data
@@ -37,7 +39,9 @@ const sampleStores: Store[] = [
     manager: 'Alex Johnson',
     status: 'active',
     equipmentCount: 45,
-    description: 'Our flagship store with the largest equipment selection.'
+    description: 'Our flagship store with the largest equipment selection.',
+    longitude: -74.0060,
+    latitude: 40.7128
   },
   {
     id: '2',
@@ -50,7 +54,9 @@ const sampleStores: Store[] = [
     manager: 'Sarah Chen',
     status: 'active',
     equipmentCount: 38,
-    description: 'Convenient location for film and video professionals.'
+    description: 'Convenient location for film and video professionals.',
+    longitude: -73.9857,
+    latitude: 40.7614
   },
   {
     id: '3',
@@ -63,7 +69,9 @@ const sampleStores: Store[] = [
     manager: 'Mike Rodriguez',
     status: 'maintenance',
     equipmentCount: 32,
-    description: 'Specialized in photography equipment and studio gear.'
+    description: 'Specialized in photography equipment and studio gear.',
+    longitude: -73.9442,
+    latitude: 40.7831
   }
 ];
 
@@ -84,7 +92,9 @@ export const StoreManagement = () => {
     manager: '',
     status: 'active' as Store['status'],
     equipmentCount: 0,
-    description: ''
+    description: '',
+    longitude: 0,
+    latitude: 0
   });
 
   const resetForm = () => {
@@ -98,7 +108,9 @@ export const StoreManagement = () => {
       manager: '',
       status: 'active',
       equipmentCount: 0,
-      description: ''
+      description: '',
+      longitude: 0,
+      latitude: 0
     });
   };
 
@@ -189,6 +201,33 @@ export const StoreManagement = () => {
           onChange={(e) => setFormData(prev => ({ ...prev, address: e.target.value }))}
           required
         />
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="longitude">Longitude</Label>
+          <Input
+            id="longitude"
+            type="number"
+            step="any"
+            value={formData.longitude}
+            onChange={(e) => setFormData(prev => ({ ...prev, longitude: parseFloat(e.target.value) || 0 }))}
+            placeholder="e.g., -74.0060"
+            required
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="latitude">Latitude</Label>
+          <Input
+            id="latitude"
+            type="number"
+            step="any"
+            value={formData.latitude}
+            onChange={(e) => setFormData(prev => ({ ...prev, latitude: parseFloat(e.target.value) || 0 }))}
+            placeholder="e.g., 40.7128"
+            required
+          />
+        </div>
       </div>
 
       <div className="grid grid-cols-2 gap-4">
