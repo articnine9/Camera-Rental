@@ -9,7 +9,8 @@ import {
   Settings,
   LogOut,
   User,
-  Tag
+  Tag,
+  UserCheck
 } from "lucide-react";
 import {
   Sidebar,
@@ -34,6 +35,7 @@ const menuItems = [
   { title: "Equipment", url: "/equipment", icon: Camera, section: "equipment" },
   { title: "Categories", url: "/categories", icon: Tag, section: "categories" },
   { title: "Bookings", url: "/bookings", icon: Calendar, section: "bookings" },
+  { title: "Customers", url: "/customers", icon: UserCheck, section: "customers" },
   { title: "Users", url: "/users", icon: Users, section: "users" },
   { title: "Stores", url: "/stores", icon: MapPin, section: "stores" },
 ];

@@ -7,6 +7,7 @@ import { useAuthStore } from '@/lib/stores/auth-store';
 import { EquipmentManagement } from '@/components/admin/EquipmentManagement';
 import CategoryManagement from '@/components/admin/CategoryManagement';
 import { BookingManagement } from '@/components/admin/BookingManagement';
+import CustomerManagement from '@/components/admin/CustomerManagement';
 import { UserManagement } from '@/components/admin/UserManagement';
 import { StoreManagement } from '@/components/admin/StoreManagement';
 import { AdminStats } from '@/components/admin/AdminStats';
@@ -162,6 +163,8 @@ export default function Admin() {
         return <CategoryManagement />;
       case 'bookings':
         return <BookingManagement />;
+      case 'customers':
+        return <CustomerManagement />;
       case 'users':
         return <UserManagement />;
       case 'stores':
