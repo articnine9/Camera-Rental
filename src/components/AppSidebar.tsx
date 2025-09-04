@@ -8,7 +8,8 @@ import {
   MapPin, 
   Settings,
   LogOut,
-  User
+  User,
+  Tag
 } from "lucide-react";
 import {
   Sidebar,
@@ -31,6 +32,7 @@ import { useAuthStore } from "@/lib/stores/auth-store";
 const menuItems = [
   { title: "Overview", url: "/", icon: BarChart3, section: "overview" },
   { title: "Equipment", url: "/equipment", icon: Camera, section: "equipment" },
+  { title: "Categories", url: "/categories", icon: Tag, section: "categories" },
   { title: "Bookings", url: "/bookings", icon: Calendar, section: "bookings" },
   { title: "Users", url: "/users", icon: Users, section: "users" },
   { title: "Stores", url: "/stores", icon: MapPin, section: "stores" },

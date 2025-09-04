@@ -5,6 +5,7 @@ import { Camera, Calendar, Menu } from 'lucide-react';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { useAuthStore } from '@/lib/stores/auth-store';
 import { EquipmentManagement } from '@/components/admin/EquipmentManagement';
+import CategoryManagement from '@/components/admin/CategoryManagement';
 import { BookingManagement } from '@/components/admin/BookingManagement';
 import { UserManagement } from '@/components/admin/UserManagement';
 import { StoreManagement } from '@/components/admin/StoreManagement';
@@ -157,6 +158,8 @@ export default function Admin() {
         );
       case 'equipment':
         return <EquipmentManagement />;
+      case 'categories':
+        return <CategoryManagement />;
       case 'bookings':
         return <BookingManagement />;
       case 'users':
