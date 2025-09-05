@@ -143,14 +143,14 @@ const CategoryManagement = () => {
       <div className="space-y-2">
         <Label htmlFor="parentId">Parent Category (Optional)</Label>
         <Select 
-          value={formData.parentId} 
-          onValueChange={(value) => setFormData(prev => ({ ...prev, parentId: value }))}
+          value={formData.parentId || "none"} 
+          onValueChange={(value) => setFormData(prev => ({ ...prev, parentId: value === "none" ? "" : value }))}
         >
           <SelectTrigger>
             <SelectValue placeholder="Select parent category" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">No Parent (Root Category)</SelectItem>
+            <SelectItem value="none">No Parent (Root Category)</SelectItem>
             {getRootCategories().map((category) => (
               <SelectItem key={category.id} value={category.id}>
                 {category.name}
