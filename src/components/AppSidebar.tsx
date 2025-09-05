@@ -38,6 +38,7 @@ const menuItems = [
   { title: "Customers", url: "/customers", icon: UserCheck, section: "customers" },
   { title: "Users", url: "/users", icon: Users, section: "users" },
   { title: "Stores", url: "/stores", icon: MapPin, section: "stores" },
+  { title: "Settings", url: "/settings", icon: Settings, section: "settings" },
 ];
 
 interface AppSidebarProps {

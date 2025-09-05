@@ -10,6 +10,7 @@ import { BookingManagement } from '@/components/admin/BookingManagement';
 import CustomerManagement from '@/components/admin/CustomerManagement';
 import { UserManagement } from '@/components/admin/UserManagement';
 import { StoreManagement } from '@/components/admin/StoreManagement';
+import SettingsManagement from '@/components/admin/SettingsManagement';
 import { AdminStats } from '@/components/admin/AdminStats';
 import { useEquipmentStore } from '@/lib/stores/equipment-store';
 import { useBookingStore } from '@/lib/stores/booking-store';
@@ -169,6 +170,8 @@ export default function Admin() {
         return <UserManagement />;
       case 'stores':
         return <StoreManagement />;
+      case 'settings':
+        return <SettingsManagement />;
       default:
         return null;
     }
